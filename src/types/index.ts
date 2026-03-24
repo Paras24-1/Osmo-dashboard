@@ -1,0 +1,90 @@
+// ============================================================
+// Type Definitions — WhatsApp Chat Dashboard
+// ============================================================
+
+export type Direction = 'incoming' | 'outgoing'
+
+export type Stage =
+  | 'new'
+  | 'interested'
+  | 'booking'
+  | 'confirmed'
+  | 'cancelled'
+  | 'completed'
+
+export interface Conversation {
+  id: string
+  phone_number: string
+  name: string
+  last_message: string | null
+  unread_count: number
+  ai_mode: boolean
+  stage: Stage
+  created_at: string
+  updated_at: string
+  lead?: Lead
+}
+
+export interface Message {
+  id: string
+  conversation_id: string
+  phone_number: string
+  message: string
+  direction: Direction
+  timestamp: string
+  created_at: string
+}
+
+export interface Lead {
+  id: string
+  conversation_id: string
+  phone_number: string
+  name: string | null
+  stage: Stage
+  checkin_date: string | null
+  checkout_date: string | null
+  room_type: string | null
+  num_guests: number | null
+  budget: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+// n8n / Webhook payload
+export interface WebhookPayload {
+  phone_number: string
+  name?: string
+  message: string
+  direction: Direction
+  timestamp?: string
+}
+
+// Manual reply request
+export interface ReplyPayload {
+  conversation_id: string
+  phone_number: string
+  message: string
+}
+
+export interface Database {
+  public: {
+    Tables: {
+      conversations: {
+        Row: Conversation
+        Insert: Partial<Conversation>
+        Update: Partial<Conversation>
+      }
+      messages: {
+        Row: Message
+        Insert: Partial<Message>
+        Update: Partial<Message>
+      }
+      leads: {
+        Row: Lead
+        Insert: Partial<Lead>
+        Update: Partial<Lead>
+      }
+    }
+  }
+}
