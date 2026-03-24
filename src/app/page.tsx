@@ -60,7 +60,7 @@ export default function DashboardPage() {
           )}
           <MessageSquare className="w-5 h-5 text-white" />
           <span className="text-white font-semibold text-sm">
-            {mobileView === 'list' && 'WhatsApp Dashboard'}
+            {mobileView === 'list' && 'Service Dashboard'}
             {mobileView === 'chat' && (selected?.name || 'Chat')}
             {mobileView === 'lead' && 'Lead Info'}
           </span>

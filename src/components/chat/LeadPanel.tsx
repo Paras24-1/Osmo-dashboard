@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { Conversation, Lead, Stage } from '@/types'
 import {
-  Phone, User, Calendar, Bed, Users,
-  FileText, ChevronDown, ChevronUp, RefreshCw, Mail
+  Phone, User, Calendar, FileText,
+  ChevronDown, ChevronUp, RefreshCw, Mail,
+  MapPin, Star, PhoneCall, Tag
 } from 'lucide-react'
 
 const STAGE_COLORS: Record<string, string> = {
@@ -16,17 +17,21 @@ const STAGE_COLORS: Record<string, string> = {
   completed:  'bg-purple-200 text-purple-800',
 }
 
+const QUALITY_COLORS: Record<string, string> = {
+  hot:    'bg-red-100 text-red-700',
+  warm:   'bg-amber-100 text-amber-700',
+  cold:   'bg-blue-100 text-blue-700',
+  dead:   'bg-gray-100 text-gray-500',
+}
+
 interface SheetData {
   Phone?: string
   Name?: string
-  Email?: string
-  Checkin?: string
-  Checkout?: string
-  Guests?: string
-  Room_Type?: string
-  Stage?: string
-  Last_Message?: string
-  Updated?: string
+  Lead_Type?: string
+  Pincode?: string
+  Budget?: string
+  Lead_Quality?: string
+  Callback_Ready?: string
   'CHAT SUMMARY'?: string
   [key: string]: string | undefined
 }
@@ -41,7 +46,7 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: Props) {
   const [sheetData, setSheetData] = useState<SheetData | null>(null)
   const [loading, setLoading]     = useState(false)
   const [error, setError]         = useState('')
-  const [open, setOpen]           = useState({ contact: true, booking: true, summary: true })
+  const [open, setOpen]           = useState({ contact: true, lead: true, summary: true })
 
   const fetchSheetData = async () => {
     if (!conversation?.phone_number) return
@@ -81,7 +86,8 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: Props) {
     )
   }
 
-  const stage = sheetData?.Stage || lead?.stage || 'new'
+  const quality = sheetData?.Lead_Quality?.toLowerCase() || ''
+  const callbackReady = sheetData?.Callback_Ready?.toLowerCase()
 
   return (
     <aside className="h-full flex flex-col border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-y-auto">
@@ -100,10 +106,19 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: Props) {
           </button>
         </div>
 
-        {/* Stage badge */}
-        <span className={`inline-block mt-2 text-xs px-2.5 py-0.5 rounded-full font-medium ${STAGE_COLORS[stage.toLowerCase()] || STAGE_COLORS.new}`}>
-          {stage.charAt(0).toUpperCase() + stage.slice(1)}
-        </span>
+        {/* Lead Quality Badge */}
+        {quality && (
+          <span className={`inline-block mt-2 text-xs px-2.5 py-0.5 rounded-full font-medium capitalize ${QUALITY_COLORS[quality] || 'bg-gray-100 text-gray-600'}`}>
+            {quality} lead
+          </span>
+        )}
+
+        {/* Callback Ready Badge */}
+        {callbackReady === 'yes' && (
+          <span className="inline-block mt-2 ml-2 text-xs px-2.5 py-0.5 rounded-full font-medium bg-green-100 text-green-700">
+            ✓ Callback Ready
+          </span>
+        )}
 
         {/* Source indicator */}
         {sheetData ? (
@@ -128,32 +143,39 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: Props) {
         <Field label="Phone" icon={<Phone className="w-3.5 h-3.5" />}>
           <span className="font-mono">{sheetData?.Phone || conversation.phone_number}</span>
         </Field>
-        <Field label="Email" icon={<Mail className="w-3.5 h-3.5" />}>
-          {sheetData?.Email || '—'}
+        <Field label="Pincode" icon={<MapPin className="w-3.5 h-3.5" />}>
+          {sheetData?.Pincode || '—'}
         </Field>
       </Section>
 
-      {/* Booking Section */}
+      {/* Lead Details Section */}
       <Section
-        title="Booking"
-        icon={<Calendar className="w-3.5 h-3.5" />}
-        open={open.booking}
-        onToggle={() => toggle('booking')}
+        title="Lead Details"
+        icon={<Tag className="w-3.5 h-3.5" />}
+        open={open.lead}
+        onToggle={() => toggle('lead')}
       >
-        <Field label="Check-in" icon={<Calendar className="w-3.5 h-3.5" />}>
-          {sheetData?.Checkin || '—'}
+        <Field label="Lead Type" icon={<Tag className="w-3.5 h-3.5" />}>
+          {sheetData?.Lead_Type || '—'}
         </Field>
-        <Field label="Check-out" icon={<Calendar className="w-3.5 h-3.5" />}>
-          {sheetData?.Checkout || '—'}
+        <Field label="Budget" icon={<FileText className="w-3.5 h-3.5" />}>
+          {sheetData?.Budget || '—'}
         </Field>
-        <Field label="Room Type" icon={<Bed className="w-3.5 h-3.5" />}>
-          {sheetData?.Room_Type || '—'}
+        <Field label="Lead Quality" icon={<Star className="w-3.5 h-3.5" />}>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium capitalize ${QUALITY_COLORS[quality] || 'bg-gray-100 text-gray-600'}`}>
+            {sheetData?.Lead_Quality || '—'}
+          </span>
         </Field>
-        <Field label="Guests" icon={<Users className="w-3.5 h-3.5" />}>
-          {sheetData?.Guests || '—'}
-        </Field>
-        <Field label="Last Updated" icon={<Calendar className="w-3.5 h-3.5" />}>
-          {sheetData?.Updated || '—'}
+        <Field label="Callback Ready" icon={<PhoneCall className="w-3.5 h-3.5" />}>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+            callbackReady === 'yes'
+              ? 'bg-green-100 text-green-700'
+              : callbackReady === 'no'
+              ? 'bg-red-100 text-red-600'
+              : 'bg-gray-100 text-gray-500'
+          }`}>
+            {sheetData?.Callback_Ready || '—'}
+          </span>
         </Field>
       </Section>
 
@@ -165,7 +187,7 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: Props) {
         onToggle={() => toggle('summary')}
       >
         <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
-          {sheetData?.['CHAT SUMMARY'] || sheetData?.Last_Message || 'No summary yet.'}
+          {sheetData?.['CHAT SUMMARY'] || 'No summary yet.'}
         </p>
       </Section>
     </aside>
