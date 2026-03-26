@@ -187,7 +187,7 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: Props) {
         onToggle={() => toggle('summary')}
       >
         <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
-          {sheetData?.['CHAT SUMMARY'] || 'No summary yet.'}
+          {sheetData?.['summary'] || sheetData?.['CHAT SUMMARY'] || 'No summary yet.'}
         </p>
       </Section>
     </aside>
