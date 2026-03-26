@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing config' }, { status: 500 })
     }
 
-    const range = `${encodeURIComponent(sheetName)}!A:M`
+    const range = `${encodeURIComponent(sheetName)}!A:Z`
     const url   = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
 
     const res  = await fetch(url)
