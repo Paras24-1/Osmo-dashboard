@@ -188,15 +188,55 @@ function MessageBubble({ message, isLast }: { message: Message; isLast: boolean 
 
   return (
     <div className={`max-w-[70%] flex flex-col ${isOutgoing ? 'items-end' : 'items-start'}`}>
-      <div
-        className={`px-3.5 py-2 rounded-2xl text-sm leading-relaxed break-words ${
-          isOutgoing
-            ? 'bg-emerald-500 text-white rounded-br-md'
-            : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm rounded-bl-md'
-        }`}
-      >
-        {message.message}
+      <div className={`rounded-2xl overflow-hidden ${
+        isOutgoing
+          ? 'bg-emerald-500 text-white rounded-br-md'
+          : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm rounded-bl-md'
+      }`}>
+        {/* Image message */}
+        {message.media_url && message.media_type === 'image' && (
+          <a href={message.media_url} target="_blank" rel="noopener noreferrer">
+            <img
+              src={message.media_url}
+              alt="Shared image"
+              className="max-w-[260px] max-h-[300px] object-cover cursor-pointer hover:opacity-90 transition-opacity"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none'
+              }}
+            />
+          </a>
+        )}
+
+        {/* Document message */}
+        {message.media_url && message.media_type === 'document' && (
+          
+            href={message.media_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2 px-3.5 py-2 text-sm ${isOutgoing ? 'text-white' : 'text-gray-700 dark:text-gray-200'}`}
+          >
+            <span className="text-lg">📄</span>
+            <span className="underline">View Document</span>
+          </a>
+        )}
+
+        {/* Audio message */}
+        {message.media_url && message.media_type === 'audio' && (
+          <div className="px-3 py-2">
+            <audio controls className="max-w-[220px] h-8">
+              <source src={message.media_url} />
+            </audio>
+          </div>
+        )}
+
+        {/* Text message */}
+        {message.message && !(message.media_type && !message.message.startsWith('[')) && (
+          <p className="px-3.5 py-2 text-sm leading-relaxed break-words">
+            {message.message}
+          </p>
+        )}
       </div>
+
       {isLast && (
         <span className="text-[10px] text-gray-400 mt-0.5 px-1">{time}</span>
       )}
