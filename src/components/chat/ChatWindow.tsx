@@ -20,7 +20,6 @@ export default function ChatWindow({ conversation, onAIToggle }: Props) {
   const { sendMessage, sending } = useSendMessage()
   const { toggleAI } = useToggleAI()
 
-  // Sync aiMode with conversation prop
   useEffect(() => {
     if (conversation) setAiMode(conversation.ai_mode)
   }, [conversation])
@@ -73,8 +72,6 @@ export default function ChatWindow({ conversation, onAIToggle }: Props) {
           <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{conversation.name}</p>
           <p className="text-xs text-gray-500">{conversation.phone_number}</p>
         </div>
-
-        {/* AI Toggle */}
         <button
           onClick={handleToggleAI}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
@@ -82,13 +79,8 @@ export default function ChatWindow({ conversation, onAIToggle }: Props) {
               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400'
               : 'bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-400'
           }`}
-          title={aiMode ? 'AI is handling. Click to take over.' : 'You are in control. Click to enable AI.'}
         >
-          {aiMode ? (
-            <><Bot className="w-3.5 h-3.5" /> AI Mode ON</>
-          ) : (
-            <><User className="w-3.5 h-3.5" /> Human Mode</>
-          )}
+          {aiMode ? <><Bot className="w-3.5 h-3.5" /> AI Mode ON</> : <><User className="w-3.5 h-3.5" /> Human Mode</>}
         </button>
       </div>
 
@@ -135,11 +127,7 @@ export default function ChatWindow({ conversation, onAIToggle }: Props) {
             disabled={!input.trim() || sending}
             className="p-2.5 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
           >
-            {sending ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
+            {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </div>
       </div>
@@ -147,11 +135,9 @@ export default function ChatWindow({ conversation, onAIToggle }: Props) {
   )
 }
 
-// Group consecutive messages from same sender
 function MessageGroups({ messages }: { messages: Message[] }) {
   const groups: Message[][] = []
   let currentGroup: Message[] = []
-
   for (const msg of messages) {
     if (currentGroup.length === 0 || currentGroup[0].direction === msg.direction) {
       currentGroup.push(msg)
@@ -161,7 +147,6 @@ function MessageGroups({ messages }: { messages: Message[] }) {
     }
   }
   if (currentGroup.length > 0) groups.push(currentGroup)
-
   return (
     <>
       {groups.map((group, gi) => (
@@ -193,34 +178,28 @@ function MessageBubble({ message, isLast }: { message: Message; isLast: boolean 
           ? 'bg-emerald-500 text-white rounded-br-md'
           : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-sm rounded-bl-md'
       }`}>
-        {/* Image message */}
+        {/* Image */}
         {message.media_url && message.media_type === 'image' && (
           <a href={message.media_url} target="_blank" rel="noopener noreferrer">
             <img
               src={message.media_url}
               alt="Shared image"
               className="max-w-[260px] max-h-[300px] object-cover cursor-pointer hover:opacity-90 transition-opacity"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none'
-              }}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
           </a>
         )}
 
-        {/* Document message */}
+        {/* Document */}
         {message.media_url && message.media_type === 'document' && (
-          
-            href={message.media_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center gap-2 px-3.5 py-2 text-sm ${isOutgoing ? 'text-white' : 'text-gray-700 dark:text-gray-200'}`}
-          >
+          <a href={message.media_url} target="_blank" rel="noopener noreferrer"
+            className={`flex items-center gap-2 px-3.5 py-2 text-sm ${isOutgoing ? 'text-white' : 'text-gray-700 dark:text-gray-200'}`}>
             <span className="text-lg">📄</span>
             <span className="underline">View Document</span>
           </a>
         )}
 
-        {/* Audio message */}
+        {/* Audio */}
         {message.media_url && message.media_type === 'audio' && (
           <div className="px-3 py-2">
             <audio controls className="max-w-[220px] h-8">
@@ -229,8 +208,15 @@ function MessageBubble({ message, isLast }: { message: Message; isLast: boolean 
           </div>
         )}
 
-        {/* Text message */}
-        {message.message && !(message.media_type && !message.message.startsWith('[')) && (
+        {/* Text */}
+        {message.message && !['image', 'document', 'audio'].includes(message.media_type || '') && (
+          <p className="px-3.5 py-2 text-sm leading-relaxed break-words">
+            {message.message}
+          </p>
+        )}
+
+        {/* Text caption below image */}
+        {message.media_url && message.media_type === 'image' && message.message && !message.message.startsWith('[') && (
           <p className="px-3.5 py-2 text-sm leading-relaxed break-words">
             {message.message}
           </p>
