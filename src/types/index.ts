@@ -33,6 +33,9 @@ export interface Message {
   direction: Direction
   timestamp: string
   created_at: string
+  media_url?: string | null    // ← add this
+  media_type?: string | null   // ← add this
+
 }
 
 export interface Lead {
