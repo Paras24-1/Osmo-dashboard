@@ -68,7 +68,8 @@ const STATUS_ICONS = {
 // ── Helpers ────────────────────────────────────────────────────
 function extractVariables(body: string): string[] {
   const matches = body.match(/{{\d+}}/g) || []
-  return [...new Set(matches)].sort()
+  return Array.from(new Set(matches)).sort()
+
 }
 
 function buildPreview(body: string, mapping: Record<string, string>, sampleContact: Contact): string {
