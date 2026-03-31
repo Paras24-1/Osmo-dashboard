@@ -301,7 +301,7 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
   }
 
   const templateVariables = selectedTemplate ? extractVariables(selectedTemplate.body) : []
-  const sampleContact     = filteredContacts[0] || {} as Contact
+  const sampleContact = (filteredContacts[0] || {}) as Contact
   const previewText       = selectedTemplate
     ? buildPreview(selectedTemplate.body, variableMapping, sampleContact)
     : ''
