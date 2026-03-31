@@ -168,7 +168,6 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
   const [campaignName, setCampaignName]         = useState('')
   const [templateName, setTemplateName]         = useState('')
   const [templateBody, setTemplateBody]         = useState('')
-  const [scheduledAt, setScheduledAt]           = useState('')
   const [sending, setSending]                   = useState(false)
   const [gsUrl, setGsUrl]                       = useState('')
   const [loadingGs, setLoadingGs]               = useState(false)
@@ -284,7 +283,7 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
           name:          campaignName,
           template_name: templateName,
           template_body: templateBody,
-          scheduled_at:  scheduledAt || null,
+          scheduled_at: null,
           variable_mapping: variableMapping,
           contacts: filteredContacts.map((c) => {
             // Build resolved variables for this contact
@@ -515,18 +514,7 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
               )}
 
               {/* Schedule */}
-              <div>
-                <label className="text-xs text-gray-500 font-medium uppercase tracking-wide">Schedule (optional)</label>
-                <div className="flex gap-2">
-                  <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)}
-                    className="flex-1 mt-1 px-3 py-2 text-sm rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-                  {scheduledAt && (
-                    <button onClick={() => setScheduledAt('')} className="mt-1 px-3 py-2 bg-red-100 text-red-600 text-sm rounded-xl hover:bg-red-200">Clear</button>
-                  )}
-                </div>
-                <p className="text-[10px] text-gray-400 mt-1">Leave empty to send immediately</p>
-              </div>
-            </div>
+              
 
             <button onClick={() => setStep(4)} disabled={!campaignName || !templateName}
               className="mt-4 w-full py-2 bg-emerald-500 text-white text-sm rounded-xl hover:bg-emerald-600 disabled:opacity-40 font-medium">
@@ -542,7 +530,6 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
               <ReviewRow label="Campaign"   value={campaignName} />
               <ReviewRow label="Template"   value={templateName} />
               <ReviewRow label="Recipients" value={`${filteredContacts.length} contacts`} />
-              <ReviewRow label="Schedule"   value={scheduledAt ? new Date(scheduledAt).toLocaleString() : 'Send immediately'} />
 
               {/* Variable mapping summary */}
               {templateVariables.length > 0 && (
@@ -580,7 +567,8 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
               className="w-full py-3 bg-emerald-500 text-white text-sm rounded-xl hover:bg-emerald-600 disabled:opacity-50 font-semibold flex items-center justify-center gap-2">
               {sending
                 ? <><RefreshCw className="w-4 h-4 animate-spin" /> Creating Campaign...</>
-                : <><Send className="w-4 h-4" /> {scheduledAt ? 'Schedule Campaign' : `Send to ${filteredContacts.length} Contacts`}</>
+                : <><Send className="w-4 h-4" /> 
+                  {`Send to ${filteredContacts.length} Contacts`}</>
               }
             </button>
           </StepCard>
