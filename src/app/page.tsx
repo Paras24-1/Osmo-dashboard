@@ -67,23 +67,30 @@ export default function DashboardPage() {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {/* Lead info button on mobile when in chat */}
-          {mobileView === 'chat' && selected && (
-            <button
-              onClick={() => setMobileView('lead')}
-              className="p-1.5 rounded-lg text-emerald-100 hover:bg-emerald-700 md:hidden"
-              title="View lead info"
-            >
-              <Info className="w-4 h-4" />
-            </button>
-          )}
-          <button
-            onClick={() => setDark((d) => !d)}
-            className="p-1.5 rounded-lg text-emerald-100 hover:bg-emerald-700 transition-colors"
-          >
-            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-        </div>
+  {/* Lead info button on mobile when in chat */}
+  {mobileView === 'chat' && selected && (
+    <button
+      onClick={() => setMobileView('lead')}
+      className="p-1.5 rounded-lg text-emerald-100 hover:bg-emerald-700 md:hidden"
+      title="View lead info"
+    >
+      <Info className="w-4 h-4" />
+    </button>
+  )}
+  <Link
+    href="/bulk"
+    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-medium rounded-lg transition-colors"
+  >
+    <Send className="w-3.5 h-3.5" />
+    <span className="hidden md:block">Bulk Message</span>
+  </Link>
+  <button
+    onClick={() => setDark((d) => !d)}
+    className="p-1.5 rounded-lg text-emerald-100 hover:bg-emerald-700 transition-colors"
+  >
+    {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+  </button>
+</div>
       </header>
 
       {/* 
