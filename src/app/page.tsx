@@ -5,7 +5,8 @@ import ConversationList from '@/components/chat/ConversationList'
 import ChatWindow from '@/components/chat/ChatWindow'
 import LeadPanel from '@/components/chat/LeadPanel'
 import { Conversation, Lead } from '@/types'
-import { MessageSquare, Moon, Sun, ArrowLeft, Info } from 'lucide-react'
+import { MessageSquare, Moon, Sun, ArrowLeft, Info, Send } from 'lucide-react'
+import Link from 'next/link'
 
 type MobileView = 'list' | 'chat' | 'lead'
 
