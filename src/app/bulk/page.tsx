@@ -614,7 +614,10 @@ function CampaignHistory({ campaigns, onRefresh }: { campaigns: Campaign[]; onRe
   const loadContacts = async (id: string) => {
     if (contacts[id]) { setExpanded(expanded === id ? null : id); return }
     const res = await fetch(`/api/campaigns/contacts?campaign_id=${id}`)
-    if (res.ok) setContacts((prev) => ({ ...prev, [id]: await res.json() }))
+    if (res.ok) {
+  const data = await res.json()
+  setContacts((prev) => ({ ...prev, [id]: data }))
+}
     setExpanded(id)
   }
 
