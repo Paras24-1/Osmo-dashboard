@@ -123,15 +123,31 @@ export default function BulkMessagingPage() {
       </div>
     </div>
     <div className="flex gap-2">
-            <button onClick={() => setTab('new')} className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'new' ? 'bg-emerald-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
-              <Plus className="w-4 h-4 inline mr-1.5" />New Campaign
-            </button>
-            <button onClick={() => setTab('history')} className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'history' ? 'bg-emerald-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
-              <BarChart2 className="w-4 h-4 inline mr-1.5" />Campaign History
-            </button>
-          </div>
-        </div>
-      </div>
+      <button
+        onClick={() => setTab('new')}
+        className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+          tab === 'new'
+            ? 'bg-emerald-500 text-white'
+            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+        }`}
+      >
+        <Plus className="w-4 h-4 inline mr-1.5" />
+        New Campaign
+      </button>
+      <button
+        onClick={() => setTab('history')}
+        className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+          tab === 'history'
+            ? 'bg-emerald-500 text-white'
+            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+        }`}
+      >
+        <BarChart2 className="w-4 h-4 inline mr-1.5" />
+        Campaign History
+      </button>
+    </div>
+  </div>
+</div>
 
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
