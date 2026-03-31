@@ -6,8 +6,11 @@ import * as XLSX from 'xlsx'
 import {
   Upload, Send, Filter, Clock, BarChart2,
   CheckCircle, XCircle, AlertCircle, RefreshCw,
-  Download, Pause, MessageSquare, TrendingUp, X, Plus, Eye
+  Download, Pause, MessageSquare, TrendingUp, X, Plus, Eye,
+  ArrowLeft, Trash2
 } from 'lucide-react'
+import Link from 'next/link'
+
 import { supabase } from '@/lib/supabase'
 
 interface Contact {
@@ -107,14 +110,19 @@ export default function BulkMessagingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Bulk Messaging</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Send WhatsApp template messages to multiple contacts</p>
-          </div>
-          <div className="flex gap-2">
+    <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 px-6 py-4 sticky top-0 z-10">
+  <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <div className="flex items-center gap-3">
+      <Link href="/" className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+        <ArrowLeft className="w-3.5 h-3.5" />
+        <span>Back to Chats</span>
+      </Link>
+      <div>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Bulk Messaging</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Send WhatsApp template messages to multiple contacts</p>
+      </div>
+    </div>
+    <div className="flex gap-2">
             <button onClick={() => setTab('new')} className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'new' ? 'bg-emerald-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
               <Plus className="w-4 h-4 inline mr-1.5" />New Campaign
             </button>
@@ -611,6 +619,12 @@ function CampaignHistory({ campaigns, onRefresh }: { campaigns: Campaign[]; onRe
   const [expanded, setExpanded] = useState<string | null>(null)
   const [contacts, setContacts] = useState<Record<string, any[]>>({})
 
+  const deleteCampaign = async (id: string) => {
+  if (!confirm('Delete this campaign and all its contacts? This cannot be undone.')) return
+  const res = await fetch(`/api/campaigns/${id}`, { method: 'DELETE' })
+  if (res.ok) onRefresh()
+  else alert('Failed to delete campaign')
+}
   const loadContacts = async (id: string) => {
     if (contacts[id]) { setExpanded(expanded === id ? null : id); return }
     const res = await fetch(`/api/campaigns/contacts?campaign_id=${id}`)
@@ -662,16 +676,28 @@ function CampaignHistory({ campaigns, onRefresh }: { campaigns: Campaign[]; onRe
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => { loadContacts(campaign.id); exportCampaign(campaign) }}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30" title="Export">
-                    <Download className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => loadContacts(campaign.id)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30" title="View contacts">
-                    <Eye className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+  <button
+    onClick={() => { loadContacts(campaign.id); exportCampaign(campaign) }}
+    className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+    title="Export report"
+  >
+    <Download className="w-4 h-4" />
+  </button>
+  <button
+    onClick={() => loadContacts(campaign.id)}
+    className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30"
+    title="View contacts"
+  >
+    <Eye className="w-4 h-4" />
+  </button>
+  <button
+    onClick={() => deleteCampaign(campaign.id)}
+    className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+    title="Delete campaign"
+  >
+    <Trash2 className="w-4 h-4" />
+  </button>
+</div>
 
               <div className="mb-2">
                 <div className="flex justify-between text-[10px] text-gray-400 mb-1">
