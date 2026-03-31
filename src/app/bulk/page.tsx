@@ -515,7 +515,7 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
 
               {/* Schedule */}
               
-
+          </div>
             <button onClick={() => setStep(4)} disabled={!campaignName || !templateName}
               className="mt-4 w-full py-2 bg-emerald-500 text-white text-sm rounded-xl hover:bg-emerald-600 disabled:opacity-40 font-medium">
               Preview & Send →
