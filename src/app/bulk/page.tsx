@@ -69,19 +69,21 @@ const STATUS_ICONS = {
 
 // ── Helpers ────────────────────────────────────────────────────
 function extractVariables(body: string): string[] {
-  const matches = body.match(/{{\d+}}/g) || []
-  return Array.from(new Set(matches)).sort()
+  const matches = body.match(/{{\s*[\w]+\s*}}/g) || []
+  return Array.from(new Set(matches.map((m) => m.replace(/\s/g, '')))).sort()
 }
 
 function buildPreview(body: string, mapping: Record<string, string>, sampleContact: Contact): string {
   let preview = body
   Object.entries(mapping).forEach(([variable, column]) => {
     const value = column ? (sampleContact[column] || column) : `[${variable}]`
-    preview = preview.replace(new RegExp(variable.replace(/[{}]/g, '\\$&'), 'g'), value)
+    // Match both {{name}} and {{ name }} (with spaces)
+    const escaped = variable.replace(/[{}]/g, '\\$&')
+    const pattern = escaped.replace(/\\\{(\\\{)/, '\\{\\{\\s*').replace(/(\\\})\\\}/, '\\s*\\}\\}')
+    preview = preview.replace(new RegExp(pattern, 'g'), value)
   })
   return preview
 }
-
 // ── Main Page ──────────────────────────────────────────────────
 export default function BulkMessagingPage() {
   const [tab, setTab]             = useState<'new' | 'history'>('history')
