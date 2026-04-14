@@ -310,6 +310,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           template_body: templateBody,
           scheduled_at: null,
           variable_mapping: variableMapping,
+          header_image_url: headerImageUrl || '', 
           contacts: filteredContacts.map((c) => {
             // Build resolved variables for this contact
             const resolvedVars: Record<string, string> = {}
