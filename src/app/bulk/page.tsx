@@ -177,9 +177,32 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
   const [loadingTemplates, setLoadingTemplates] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
   // variableMapping: { '{{1}}': 'Name', '{{2}}': 'City', ... }
-  const [variableMapping, setVariableMapping]   = useState<Record<string, string>>({})
-  const fileRef = useRef<HTMLInputElement>(null)
+const [variableMapping, setVariableMapping]   = useState<Record<string, string>>({})
+const [headerImageUrl, setHeaderImageUrl]     = useState('')
+const [uploadingImage, setUploadingImage]     = useState(false)
+const fileRef  = useRef<HTMLInputElement>(null)
+const imageRef = useRef<HTMLInputElement>(null)
 
+const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  setUploadingImage(true)
+  try {
+    const filename = `bulk-headers/${Date.now()}-${file.name.replace(/\s/g, '-')}`
+    const res = await fetch(`/api/upload-image?filename=${encodeURIComponent(filename)}`, {
+      method: 'POST',
+      body: file,
+      headers: { 'Content-Type': file.type },
+    })
+    const data = await res.json()
+    if (data.url) setHeaderImageUrl(data.url)
+    else alert('Failed to upload image')
+  } catch {
+    alert('Upload failed')
+  } finally {
+    setUploadingImage(false)
+  }
+}
   // Fetch templates on step 3
   useEffect(() => {
     if (step === 3 && templates.length === 0) {
@@ -515,6 +538,56 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
                 </div>
               )}
 
+
+
+
+              {/* Header Image Upload */}
+{selectedTemplate && (
+  <div>
+    <label className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+      Header Image (if template has image header)
+    </label>
+    <div className="mt-1">
+      {headerImageUrl ? (
+        <div className="relative">
+          <img
+            src={headerImageUrl}
+            alt="Header"
+            className="w-full max-h-40 object-cover rounded-xl border border-gray-200 dark:border-gray-700"
+          />
+          <button
+            onClick={() => setHeaderImageUrl('')}
+            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+          >
+            <X className="w-3 h-3" />
+          </button>
+          <p className="text-[10px] text-emerald-600 mt-1">✓ Image uploaded</p>
+        </div>
+      ) : (
+        <div
+          onClick={() => imageRef.current?.click()}
+          className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-4 text-center cursor-pointer hover:border-emerald-400 transition-colors"
+        >
+          <Upload className="w-5 h-5 text-gray-400 mx-auto mb-1" />
+          <p className="text-xs text-gray-500">Click to upload header image</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">JPG, PNG — max 5MB</p>
+          <input
+            ref={imageRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageUpload}
+          />
+        </div>
+      )}
+      {uploadingImage && (
+        <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+          <RefreshCw className="w-3 h-3 animate-spin" /> Uploading image...
+        </div>
+      )}
+    </div>
+  </div>
+)}
               {/* Schedule */}
               
           
