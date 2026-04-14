@@ -76,14 +76,16 @@ export async function POST(req: NextRequest) {
       const n8nUrl = process.env.N8N_BULK_WEBHOOK_URL
       if (n8nUrl) {
         await fetch(n8nUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            campaign_id: campaign.id,
-            template_name,
-            contacts,
-          }),
-        }).catch(console.error)
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    campaign_id:      campaign.id,
+    template_name,
+    header_image_url: body.header_image_url || '',
+    language_code:    'en',
+    contacts,
+  }),
+}).catch(console.error)
       }
     }
 
