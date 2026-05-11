@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     campaign_id:      campaign.id,
     template_name,
     header_image_url: body.header_image_url || '',
-    language_code:    'en',
+    language_code: language_code,
     contacts,
   }),
 }).catch(console.error)
