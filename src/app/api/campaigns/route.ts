@@ -10,9 +10,13 @@ export async function GET() {
       .order('created_at', { ascending: false })
 
     if (error) throw error
+
     return NextResponse.json(data)
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    return NextResponse.json(
+      { error: String(err) },
+      { status: 500 }
+    )
   }
 }
 
@@ -20,50 +24,67 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
+
     const {
       name,
       template_name,
       template_body,
+      language_code,
+      header_image_url,
       contacts,
       scheduled_at,
     } = body
 
+    // Validation
     if (!name || !template_name || !contacts?.length) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, template_name, contacts' },
+        {
+          error:
+            'Missing required fields: name, template_name, contacts',
+        },
         { status: 400 }
       )
     }
 
     // 1. Create campaign
-    const { data: campaign, error: campError } = await supabaseAdmin
-      .from('campaigns')
-      .insert({
-        name,
-        template_name,
-        template_body,
-        total: contacts.length,
-        status: scheduled_at ? 'draft' : 'sending',
-        scheduled_at: scheduled_at || null,
-        started_at: scheduled_at ? null : new Date().toISOString(),
-      })
-      .select()
-      .single()
+    const { data: campaign, error: campError } =
+      await supabaseAdmin
+        .from('campaigns')
+        .insert({
+          name,
+          template_name,
+          template_body,
+
+          // NEW FIELDS
+          language_code: language_code || 'en_US',
+          header_image_url: header_image_url || '',
+
+          total: contacts.length,
+          status: scheduled_at ? 'draft' : 'sending',
+          scheduled_at: scheduled_at || null,
+          started_at: scheduled_at
+            ? null
+            : new Date().toISOString(),
+        })
+        .select()
+        .single()
 
     if (campError) throw campError
 
     // 2. Insert all contacts
-    const contactRows = contacts.map((c: {
-      phone: string
-      name?: string
-      variables?: Record<string, string>
-    }) => ({
-      campaign_id: campaign.id,
-      phone: c.phone,
-      name: c.name || '',
-      variables: c.variables || {},
-      status: 'pending',
-    }))
+    const contactRows = contacts.map(
+      (c: {
+        phone: string
+        name?: string
+        variables?: Record<string, string>
+      }) => ({
+        campaign_id: campaign.id,
+        phone: c.phone,
+        name: c.name || '',
+        variables: c.variables || {},
+        status: 'pending',
+      })
+    )
 
     const { error: contactError } = await supabaseAdmin
       .from('campaign_contacts')
@@ -71,26 +92,42 @@ export async function POST(req: NextRequest) {
 
     if (contactError) throw contactError
 
-    // 3. If not scheduled, trigger n8n to start sending
+    // 3. Trigger n8n webhook if immediate sending
     if (!scheduled_at) {
       const n8nUrl = process.env.N8N_BULK_WEBHOOK_URL
+
       if (n8nUrl) {
         await fetch(n8nUrl, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    campaign_id:      campaign.id,
-    template_name,
-    header_image_url: body.header_image_url || '',
-    language_code: language_code,
-    contacts,
-  }),
-}).catch(console.error)
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+
+          body: JSON.stringify({
+            campaign_id: campaign.id,
+
+            template_name,
+
+            language_code:
+              language_code || 'en_US',
+
+            header_image_url:
+              header_image_url || '',
+
+            contacts,
+          }),
+        }).catch(console.error)
       }
     }
 
-    return NextResponse.json({ success: true, campaign_id: campaign.id })
+    return NextResponse.json({
+      success: true,
+      campaign_id: campaign.id,
+    })
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    return NextResponse.json(
+      { error: String(err) },
+      { status: 500 }
+    )
   }
 }
