@@ -170,6 +170,7 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
   const [campaignName, setCampaignName]         = useState('')
   const [templateName, setTemplateName]         = useState('')
   const [templateBody, setTemplateBody]         = useState('')
+  const [languageCode, setLanguageCode]         = useState('en_US')
   const [sending, setSending]                   = useState(false)
   const [gsUrl, setGsUrl]                       = useState('')
   const [loadingGs, setLoadingGs]               = useState(false)
@@ -308,6 +309,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           name:          campaignName,
           template_name: templateName,
           template_body: templateBody,
+          language_code: languageCode,
           scheduled_at: null,
           variable_mapping: variableMapping,
           header_image_url: headerImageUrl || '', 
@@ -476,6 +478,30 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
                   </select>
                 )}
               </div>
+
+
+              {/* Language Code */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+    Template Language
+  </label>
+
+  <select
+    value={languageCode}
+    onChange={(e) => setLanguageCode(e.target.value)}
+    className="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+  >
+    <option value="en_US">English</option>
+    <option value="hi">Hindi</option>
+    <option value="mr">Marathi</option>
+    <option value="gu">Gujarati</option>
+    <option value="ta">Tamil</option>
+    <option value="te">Telugu</option>
+    <option value="kn">Kannada</option>
+    <option value="bn">Bengali</option>
+    <option value="pa">Punjabi</option>
+  </select>
+</div>
 
               {/* ── Variable Mapping ── */}
               {selectedTemplate && templateVariables.length > 0 && (
