@@ -170,7 +170,7 @@ function NewCampaign({ onCreated }: { onCreated: () => void }) {
   const [campaignName, setCampaignName]         = useState('')
   const [templateName, setTemplateName]         = useState('')
   const [templateBody, setTemplateBody]         = useState('')
-  const [languageCode, setLanguageCode]         = useState('en_US')
+  const [languageCode, setLanguageCode]         = useState('en')
   const [sending, setSending]                   = useState(false)
   const [gsUrl, setGsUrl]                       = useState('')
   const [loadingGs, setLoadingGs]               = useState(false)
@@ -491,7 +491,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange={(e) => setLanguageCode(e.target.value)}
     className="w-full px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
   >
-    <option value="en_US">English</option>
+    <option value="en">English</option>
     <option value="hi">Hindi</option>
     <option value="mr">Marathi</option>
     <option value="gu">Gujarati</option>
