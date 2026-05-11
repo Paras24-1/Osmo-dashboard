@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
           template_body,
 
           // NEW FIELDS
-          language_code: language_code || 'en_US',
+          language_code: language_code || 'en',
           header_image_url: header_image_url || '',
 
           total: contacts.length,
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
             template_name,
 
             language_code:
-              language_code || 'en_US',
+              language_code || 'en',
 
             header_image_url:
               header_image_url || '',
