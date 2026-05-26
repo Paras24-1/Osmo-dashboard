@@ -216,7 +216,10 @@ export default function ConversationList({ selectedId, onSelect, onDelete }: Pro
                 key={conv.id}
                 conversation={conv}
                 isSelected={conv.id === selectedId}
-                onClick={() => onSelect(conv)}
+                onClick={() => {
+                  conv.unread_count = 0;
+                  onSelect(conv);
+                }}
                 onDelete={(e) => handleDelete(e, conv.id)}
                 isAdmin={isAdmin}
                 employees={employees}
@@ -359,7 +362,7 @@ function ConversationItem({
       )}
 
       {/* Unread badge */}
-      {conv.unread_count > 0 && !hovered && (
+      {conv.unread_count > 0 && !isSelected && !hovered && (
         <span className="shrink-0 min-w-[20px] h-5 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center justify-center px-1">
           {conv.unread_count > 99 ? '99+' : conv.unread_count}
         </span>
