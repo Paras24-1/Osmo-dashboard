@@ -4,6 +4,14 @@
 
 export type Direction = 'incoming' | 'outgoing'
 
+export interface User {
+  id: string
+  email: string
+  name: string
+  role: 'admin' | 'employee'
+  avatar?: string
+}
+
 export type Stage =
   | 'new'
   | 'interested'
@@ -11,18 +19,27 @@ export type Stage =
   | 'confirmed'
   | 'cancelled'
   | 'completed'
+  | 'followup'
+  | 'not_interested'
+  | 'call_done'
+  | 'low_budget'
+  | 'hot_customer'
+
+
 
 export interface Conversation {
   id: string
   phone_number: string
-  name: string
-  last_message: string | null
+  name?: string
+  last_message?: string
   unread_count: number
   ai_mode: boolean
-  stage: Stage
+  stage: string
+  notes?: string        // ← add this
+  assigned_to?: string | null
+  assignment_status?: string
   created_at: string
   updated_at: string
-  lead?: Lead
 }
 
 export interface Message {
@@ -39,21 +56,18 @@ export interface Message {
 }
 
 export interface Lead {
-  id: string
-  conversation_id: string
+  id?: string
+  conversation_id?: string
   phone_number: string
-  name: string | null
-  stage: Stage
-  checkin_date: string | null
-  checkout_date: string | null
-  room_type: string | null
-  num_guests: number | null
-  budget: string | null
-  notes: string | null
-  created_at: string
-  updated_at: string
+  name?: string
+  lead_type?: string
+  city?: string
+  machine_interest?: string
+  lead_quality?: string
+  callback_ready?: string
+  conversation_summary?: string
+  lead_score?: string  // ← ADD THIS
 }
-
 // n8n / Webhook payload
 export interface WebhookPayload {
   phone_number: string

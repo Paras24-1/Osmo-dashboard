@@ -1,37 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// GET /api/conversations
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const search = searchParams.get('search') || ''
-    const stage  = searchParams.get('stage')  || ''
-    const unread = searchParams.get('unread') === 'true'
+    const search       = searchParams.get('search')        || ''
+    const stage        = searchParams.get('stage')         || ''
+    const unread       = searchParams.get('unread')        === 'true'
+    const assignedTo   = searchParams.get('assigned_to')   || ''
+    const assignFilter = searchParams.get('assign_filter') || ''
 
     let query = supabaseAdmin
       .from('conversations')
-      .select('*, lead:leads(*)')
+      .select('*')
       .order('updated_at', { ascending: false })
 
-    if (search) {
-      query = query.or(
-        `phone_number.ilike.%${search}%,name.ilike.%${search}%`
-      )
+    // Employee: only see their assigned chats
+    if (assignedTo) {
+      query = query.eq('assigned_to', assignedTo)
     }
-    if (stage) {
-      query = query.eq('stage', stage)
+
+    // Admin assignment filter tabs
+    if (assignFilter === 'unassigned') {
+      query = query.is('assigned_to', null)
+    } else if (assignFilter === 'assigned') {
+      query = query.not('assigned_to', 'is', null)
     }
-    if (unread) {
-      query = query.gt('unread_count', 0)
-    }
+
+    if (search) query = query.or(`name.ilike.%${search}%,phone_number.ilike.%${search}%`)
+    if (stage)  query = query.eq('stage', stage)
+    if (unread) query = query.gt('unread_count', 0)
 
     const { data, error } = await query
-
     if (error) throw error
-    return NextResponse.json(data)
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : 'Unknown error'
-    return NextResponse.json({ error }, { status: 500 })
+    return NextResponse.json(data || [])
+  } catch (err) {
+    console.error('[conversations]', err)
+    return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }
