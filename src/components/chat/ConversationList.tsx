@@ -219,6 +219,9 @@ export default function ConversationList({ selectedId, onSelect, onDelete }: Pro
                 onClick={() => {
                   conv.unread_count = 0;
                   onSelect(conv);
+                  setTimeout(() => {
+                    refetch();
+                  }, 500);
                 }}
                 onDelete={(e) => handleDelete(e, conv.id)}
                 isAdmin={isAdmin}
