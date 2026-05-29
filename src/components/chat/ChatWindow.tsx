@@ -248,7 +248,7 @@ export default function ChatWindow({ conversation, onAIToggle }: Props) {
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                   }`}
                 >
-                  {msg.media_url && msg.media_type?.startsWith('image/') && (
+                  {msg.media_url && (msg.media_type === 'image' || msg.media_type?.startsWith('image/')) && (
                     <img
                       src={msg.media_url}
                       alt="Sent image"
