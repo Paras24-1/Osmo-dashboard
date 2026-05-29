@@ -68,6 +68,12 @@ CREATE INDEX idx_leads_conversation_id ON leads(conversation_id);
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
+  IF TG_TABLE_NAME = 'conversations' THEN
+    IF NEW.updated_at IS NOT DISTINCT FROM OLD.updated_at THEN
+      RETURN NEW;
+    END IF;
+  END IF;
+
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
