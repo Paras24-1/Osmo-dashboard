@@ -6,7 +6,14 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnon
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   realtime: { params: { eventsPerSecond: 10 } },
+  global: {
+    fetch: (url, init) => fetch(url, { ...init, cache: 'no-store' }),
+  },
 })
 
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  global: {
+    fetch: (url, init) => fetch(url, { ...init, cache: 'no-store' }),
+  },
+})
 

@@ -39,7 +39,9 @@ export function useConversations(filters: {
       params.set('assign_filter', filters.assignFilter)
     }
 
-    const res = await fetch(`/api/conversations?${params}`)
+    const res = await fetch(`/api/conversations?${params}`, {
+      cache: 'no-store',
+    })
     const data = await res.json()
 
     if (Array.isArray(data)) setConversations(data)
@@ -101,7 +103,8 @@ export function useMessages(conversationId: string | null) {
     setLoading(true)
 
     const res = await fetch(
-      `/api/messages?conversation_id=${conversationId}`
+      `/api/messages?conversation_id=${conversationId}`,
+      { cache: 'no-store' }
     )
 
     const data = await res.json()
