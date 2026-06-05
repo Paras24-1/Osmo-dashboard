@@ -119,19 +119,17 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: {
             <InfoCard icon={MapPin} label="Area" value={data.Area} />
             <InfoCard icon={MapPin} label="Pincode" value={data.Pincode} />
 
-            {(data.summary || data.conversation_summary) && (
-              <div className="mt-5 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
-                    <MessageSquare className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <p className="text-xs font-semibold text-gray-900 dark:text-white">Conversation Summary</p>
+            <div className="mt-5 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
+                  <MessageSquare className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
-                  {data.summary || data.conversation_summary}
-                </p>
+                <p className="text-xs font-semibold text-gray-900 dark:text-white">Conversation Summary</p>
               </div>
-            )}
+              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+                {data.summary || data.conversation_summary || "No summary yet"}
+              </p>
+            </div>
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
