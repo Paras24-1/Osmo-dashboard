@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Conversation, Lead } from '@/types'
-import { RefreshCw, Phone, User, Target, MapPin, Wrench, Star, CheckCircle, MessageSquare, TrendingUp, StickyNote, Save } from 'lucide-react'
+import { RefreshCw, Phone, User, Target, MapPin, Wrench, Star, CheckCircle, MessageSquare, TrendingUp, StickyNote, Save, DollarSign, AlertCircle, Compass, Briefcase, Clock, Home } from 'lucide-react'
 
 export default function LeadPanel({ conversation, lead, onLeadUpdate }: {
   conversation: Conversation | null
@@ -94,15 +94,32 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: {
         {data.Phone ? (
           <>
             <InfoCard icon={Phone} label="Phone Number" value={data.Phone} />
-            <InfoCard icon={User} label="Name" value={data.Name} />
+            <InfoCard icon={User} label="Name" value={data.Name || data["Customer name"]} />
+            
+            {/* Status & Intent */}
             <InfoCard icon={Target} label="Lead Type" value={data.Lead_Type} badge />
-            <InfoCard icon={MapPin} label="City" value={data.city} />
-            <InfoCard icon={Wrench} label="Machine Interest" value={data.machine_interest} />
-            <InfoCard icon={Star} label="Lead Quality" value={data.lead_quality} badge colored />
+            <InfoCard icon={Compass} label="Intent" value={data.Intent} badge />
+            <InfoCard icon={Star} label="Lead Quality" value={data.Lead_Quality || data.lead_quality} badge colored />
+            <InfoCard icon={CheckCircle} label="Callback Ready" value={data.Callback_Ready || data.callback_ready} badge />
             <InfoCard icon={TrendingUp} label="Lead Score" value={data.lead_score} badge colored />
-            <InfoCard icon={CheckCircle} label="Callback Ready" value={data.callback_ready} badge />
+            
+            {/* Budget & Business Details */}
+            <InfoCard icon={DollarSign} label="Budget" value={data.Budget} />
+            <InfoCard icon={Briefcase} label="Business Details" value={data.Business_Details} />
+            <InfoCard icon={Clock} label="Experience" value={data.Experience} />
 
-            {data.conversation_summary && (
+            {/* Interest & Issues */}
+            <InfoCard icon={Wrench} label="Item Name" value={data["item name"] || data["item name "] || data.machine_interest} />
+            <InfoCard icon={AlertCircle} label="Problem" value={data.problem} />
+            <InfoCard icon={AlertCircle} label="Issue Type" value={data.Issue_Type} />
+
+            {/* Location & Address */}
+            <InfoCard icon={MapPin} label="City" value={data.city || data.Location} />
+            <InfoCard icon={Home} label="Address" value={data.Address} />
+            <InfoCard icon={MapPin} label="Area" value={data.Area} />
+            <InfoCard icon={MapPin} label="Pincode" value={data.Pincode} />
+
+            {(data.summary || data.conversation_summary) && (
               <div className="mt-5 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
@@ -111,7 +128,7 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: {
                   <p className="text-xs font-semibold text-gray-900 dark:text-white">Conversation Summary</p>
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
-                  {data.conversation_summary}
+                  {data.summary || data.conversation_summary}
                 </p>
               </div>
             )}
