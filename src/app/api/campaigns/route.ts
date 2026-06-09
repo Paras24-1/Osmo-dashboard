@@ -46,6 +46,31 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Fetch all blocked conversations
+    const { data: blockedConvs, error: blockedError } = await supabaseAdmin
+      .from('conversations')
+      .select('phone_number')
+      .eq('is_blocked', true)
+
+    if (blockedError) throw blockedError
+
+    const blockedSet = new Set(
+      (blockedConvs || []).map((c) => c.phone_number.replace(/\D/g, '').slice(-10))
+    )
+
+    // Filter out blocked numbers
+    const filteredContacts = contacts.filter((c: { phone: string }) => {
+      const normPhone = c.phone.replace(/\D/g, '').slice(-10)
+      return !blockedSet.has(normPhone)
+    })
+
+    if (filteredContacts.length === 0) {
+      return NextResponse.json(
+        { error: 'All contacts in the campaign list are currently blocked.' },
+        { status: 400 }
+      )
+    }
+
     // 1. Create campaign
     const { data: campaign, error: campError } =
       await supabaseAdmin
@@ -59,7 +84,7 @@ export async function POST(req: NextRequest) {
           language_code: language_code || 'en',
           header_image_url: header_image_url || '',
 
-          total: contacts.length,
+          total: filteredContacts.length,
           status: scheduled_at ? 'draft' : 'sending',
           scheduled_at: scheduled_at || null,
           started_at: scheduled_at
@@ -72,7 +97,7 @@ export async function POST(req: NextRequest) {
     if (campError) throw campError
 
     // 2. Insert all contacts
-    const contactRows = contacts.map(
+    const contactRows = filteredContacts.map(
       (c: {
         phone: string
         name?: string
@@ -114,7 +139,7 @@ export async function POST(req: NextRequest) {
             header_image_url:
               header_image_url || '',
 
-            contacts,
+            contacts: filteredContacts,
           }),
         }).catch(console.error)
       }

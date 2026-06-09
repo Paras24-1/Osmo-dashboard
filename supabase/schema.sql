@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS conversations (
   unread_count  INTEGER NOT NULL DEFAULT 0,
   ai_mode       BOOLEAN NOT NULL DEFAULT TRUE,
   stage         TEXT NOT NULL DEFAULT 'new',
+  is_blocked    BOOLEAN NOT NULL DEFAULT FALSE,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

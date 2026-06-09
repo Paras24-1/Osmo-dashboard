@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Conversation, Lead } from '@/types'
-import { RefreshCw, Phone, User, Target, MapPin, Wrench, Star, CheckCircle, MessageSquare, TrendingUp, StickyNote, Save, DollarSign, AlertCircle, Compass, Briefcase, Clock, Home } from 'lucide-react'
+import { RefreshCw, Phone, User, Target, MapPin, Wrench, Star, CheckCircle, MessageSquare, TrendingUp, StickyNote, Save, DollarSign, AlertCircle, Compass, Briefcase, Clock, Home, Ban } from 'lucide-react'
 
 export default function LeadPanel({ conversation, lead, onLeadUpdate }: {
   conversation: Conversation | null
@@ -14,6 +14,36 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: {
   const [notes, setNotes] = useState('')
   const [savingNotes, setSavingNotes] = useState(false)
   const [notesSaved, setNotesSaved] = useState(false)
+  const [blocking, setBlocking] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(false)
+
+  useEffect(() => {
+    if (conversation) {
+      setIsBlocked((conversation as any).is_blocked || false)
+    }
+  }, [conversation?.id, (conversation as any)?.is_blocked])
+
+  const handleToggleBlock = async () => {
+    if (!conversation) return
+    setBlocking(true)
+    try {
+      const res = await fetch(`/api/conversations/${conversation.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_blocked: !isBlocked })
+      })
+      if (res.ok) {
+        setIsBlocked(!isBlocked)
+        if (conversation) {
+          (conversation as any).is_blocked = !isBlocked
+        }
+      }
+    } catch (err) {
+      console.error('Failed to toggle block:', err)
+    } finally {
+      setBlocking(false)
+    }
+  }
 
   useEffect(() => {
     if (!conversation) return
@@ -93,6 +123,26 @@ export default function LeadPanel({ conversation, lead, onLeadUpdate }: {
       <div className="flex-1 overflow-y-auto p-5 space-y-3">
         {data.Phone ? (
           <>
+            {/* Block/Unblock Button */}
+            <div className="mb-4">
+              <button
+                onClick={handleToggleBlock}
+                disabled={blocking}
+                className={`w-full py-2 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border transition-colors ${
+                  isBlocked
+                    ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-950/20 dark:border-red-900/40 hover:bg-red-100'
+                    : 'bg-gray-50 border-gray-200 text-gray-700 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                {blocking ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Ban className="w-3.5 h-3.5" />
+                )}
+                {isBlocked ? 'Blocked (Click to Unblock)' : 'Block Contact'}
+              </button>
+            </div>
+
             <InfoCard icon={Phone} label="Phone Number" value={data.Phone} />
             <InfoCard icon={User} label="Name" value={data.Name || data["Customer name"]} />
             

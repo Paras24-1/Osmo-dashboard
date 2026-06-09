@@ -36,6 +36,7 @@ export interface Conversation {
   ai_mode: boolean
   stage: string
   notes?: string        // ← add this
+  is_blocked?: boolean
   assigned_to?: string | null
   assignment_status?: string
   created_at: string
