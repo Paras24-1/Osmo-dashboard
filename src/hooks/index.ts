@@ -21,7 +21,10 @@ export function useConversations(filters: {
 
   const fetchConversations = useCallback(async () => {
     // Wait until we know the user's role before fetching
-    if (!filters.userRole || !filters.userId) return
+    if (!filters.userRole || !filters.userId) {
+      setLoading(false)
+      return
+    }
 
     const params = new URLSearchParams()
 
@@ -39,14 +42,22 @@ export function useConversations(filters: {
       params.set('assign_filter', filters.assignFilter)
     }
 
-    const res = await fetch(`/api/conversations?${params}`, {
-      cache: 'no-store',
-    })
-    const data = await res.json()
+    try {
+      const res = await fetch(`/api/conversations?${params}`, {
+        cache: 'no-store',
+      })
+      const data = await res.json()
 
-    if (Array.isArray(data)) setConversations(data)
-
-    setLoading(false)
+      if (Array.isArray(data)) {
+        setConversations(data)
+      } else {
+        console.error('Expected array of conversations, got:', data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch conversations:', err)
+    } finally {
+      setLoading(false)
+    }
   }, [
     filters.search,
     filters.stage,
@@ -102,16 +113,24 @@ export function useMessages(conversationId: string | null) {
 
     setLoading(true)
 
-    const res = await fetch(
-      `/api/messages?conversation_id=${conversationId}`,
-      { cache: 'no-store' }
-    )
+    try {
+      const res = await fetch(
+        `/api/messages?conversation_id=${conversationId}`,
+        { cache: 'no-store' }
+      )
 
-    const data = await res.json()
+      const data = await res.json()
 
-    if (Array.isArray(data)) setMessages(data)
-
-    setLoading(false)
+      if (Array.isArray(data)) {
+        setMessages(data)
+      } else {
+        console.error('Expected array of messages, got:', data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch messages:', err)
+    } finally {
+      setLoading(false)
+    }
   }, [conversationId])
 
   useEffect(() => {
